@@ -3,6 +3,7 @@ package data
 import (
 	ptxrailwaymodels "RailwayTime/models/ptx-railway-models"
 	"RailwayTime/ptxlib"
+	"sort"
 	"sync"
 	"time"
 )
@@ -151,14 +152,22 @@ func (cache *ODStationTimeableCache) GetODStationTimetable(originStationID strin
 	}
 	cache.lock.RUnlock()
 
+	// 無 cache 的資料, call API 取得
 	timetableRsp, err = cache.ptxController.GetODStationTimetable(originStationID, destinationStationID, trainDate)
 	if err != nil {
 		return
 	}
 
+	// 初始化 map
 	if !dateExist {
 		cache.dateTimetableData[trainDate] = make(map[string]*ptxrailwaymodels.PTXDailyTrainTimeTableListResponse)
 	}
+	// 根據出發站的離站時間進行排序
+	sort.SliceStable(timetableRsp.TrainTimetableList, func(i, j int) bool {
+		return timetableRsp.TrainTimetableList[i].StopTimeList[0].DepartureTime < timetableRsp.TrainTimetableList[j].StopTimeList[0].DepartureTime
+	})
+
+	// 更新資料
 	cache.lock.Lock()
 	cache.dateTimetableData[trainDate][odKey] = timetableRsp
 	cache.lock.Unlock()
