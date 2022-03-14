@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"github.com/kataras/iris/v12/middleware/recover"
@@ -35,6 +36,11 @@ func StartServer(debugMode bool) (err error) {
 	app := iris.New()
 	if debugMode {
 		app.Logger().SetLevel("debug")
+		crs := cors.New(cors.Options{
+			AllowedOrigins:   []string{"*"},
+			AllowCredentials: true,
+		})
+		app.Use(crs)
 	}
 	app.Use(recover.New())
 	app.Use(logger.New())
