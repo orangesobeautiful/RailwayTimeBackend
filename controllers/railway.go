@@ -116,7 +116,7 @@ func (ctrl *RailwayController) GetTimetableOD(originStationID string, destinatio
 		trainNo := ptxTimetable.TrainInfo.TrainNo
 		var delayTime int32
 		if trainLiveBorad, exist := allTrainLiveInfo[trainNo]; exist {
-			delayTime = trainLiveBorad.DelayTime
+			delayTime = trainLiveBorad.DelayMinute
 		}
 
 		trainTimetableList = append(trainTimetableList, &TrainTimetable{
@@ -136,7 +136,7 @@ func (ctrl *RailwayController) GetTimetableOD(originStationID string, destinatio
 			},
 			OriginStationStopTime:      ptxTimetable.StopTimeList[0],
 			DestinationStationStopTime: ptxTimetable.StopTimeList[1],
-			DelayTime:                  delayTime,
+			DelayMinute:                delayTime,
 		})
 	}
 

@@ -35,5 +35,5 @@ type TrainTimetable struct {
 	TrainInfo                  *TrainInfo                     // 車次資訊
 	OriginStationStopTime      *ptxrailwaymodels.StopTimeInfo // 出發站時刻
 	DestinationStationStopTime *ptxrailwaymodels.StopTimeInfo // 抵達站時刻
-	DelayTime                  int32                          // 延誤時間(分鐘)
+	DelayMinute                int32                          // 延誤時間(分鐘)
 }

@@ -98,7 +98,7 @@ type TrainLiveBoardInfo struct {
 	StationID          string    `json:"StationID"`          // 經過/停靠車站代號
 	StationName        NameType  `json:"StationName"`        // 經過/停靠車站名稱
 	TrainStationStatus int32     `json:"TrainStationStatus"` // 列車目前所在之車站狀態 : [0:'進站中',1:'在站上',2:'已離站']
-	DelayTime          int32     `json:"DelayTime"`          // 延誤分鐘
+	DelayMinute        int32     `json:"DelayTime"`          // 延誤分鐘
 	UpdateTime         time.Time `json:"UpdateTime"`         // 本筆位置資料之更新日期時間
 }
 
