@@ -1,3 +1,3 @@
 #!/bin/bash
 
-go build -ldflags '-w -s'
+go build -ldflags '-s'

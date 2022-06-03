@@ -44,6 +44,7 @@ func StartServer(debugMode bool) (err error) {
 	}
 	app.Use(recover.New())
 	app.Use(logger.New())
+	app.Use(iris.Compression)
 
 	// init railway controller
 	rwController, err := controllers.NewRailwayController(serverSetting.APPID, serverSetting.APPKey)
@@ -55,7 +56,7 @@ func StartServer(debugMode bool) (err error) {
 
 	// iris listen
 	hostPort := fmt.Sprintf("%s:%d", serverSetting.ServerHost, serverSetting.ServerPort)
-	err = app.Listen(hostPort)
+	err = app.Listen(hostPort, iris.WithOptimizations)
 	if err != nil {
 		log.Fatal(err)
 	}

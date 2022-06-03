@@ -20,7 +20,7 @@ type SettingProperties struct {
 // readSettingFile 讀取設定檔案
 func readSettingFile() (setting SettingProperties, err error) {
 	const settingFilePath = "setting.toml"
-	// 檢查 setting.conf 是否存在\
+	// 檢查 setting.conf 是否存在
 	var settingFileInfo fs.FileInfo
 	if settingFileInfo, err = os.Stat(settingFilePath); err == nil {
 		// 如果 setting.conf 存在
