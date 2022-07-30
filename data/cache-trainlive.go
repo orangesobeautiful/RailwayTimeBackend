@@ -2,7 +2,7 @@ package data
 
 import (
 	ptxrailwaymodels "RailwayTime/models/ptx-railway-models"
-	"RailwayTime/ptxlib"
+	"RailwayTime/tdxlib"
 	"sort"
 	"sync"
 	"time"
@@ -14,10 +14,10 @@ type TrainLiveBoradCache struct {
 	data map[string]*ptxrailwaymodels.TrainLiveBoardInfo
 }
 
-func newTrainLiveBoradCache(ptxCtrl *ptxlib.PTXController) (cache *TrainLiveBoradCache) {
+func newTrainLiveBoradCache(tdxCtrl *tdxlib.TDXController) (cache *TrainLiveBoradCache) {
 	cache = &TrainLiveBoradCache{
 		&cacheBaseUnit{
-			ptxController: ptxCtrl,
+			ptxController: tdxCtrl,
 			lock:          &sync.RWMutex{},
 		},
 		make(map[string]*ptxrailwaymodels.TrainLiveBoardInfo),
@@ -85,11 +85,11 @@ type ODStationTimeableCache struct {
 	dateTimetableData map[string]map[string]*ptxrailwaymodels.PTXDailyTrainTimeTableListResponse // 不同日期的起訖站點時刻表
 }
 
-func newODStationTimeable(ptxCtrl *ptxlib.PTXController) (cache *ODStationTimeableCache) {
+func newODStationTimeable(tdxCtrl *tdxlib.TDXController) (cache *ODStationTimeableCache) {
 	cstLocation, _ := time.LoadLocation("Asia/Taipei")
 	cache = &ODStationTimeableCache{
 		&cacheBaseUnit{
-			ptxController: ptxCtrl,
+			ptxController: tdxCtrl,
 			lock:          &sync.RWMutex{},
 		},
 		cstLocation,

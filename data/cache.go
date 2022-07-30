@@ -1,7 +1,7 @@
 package data
 
 import (
-	"RailwayTime/ptxlib"
+	"RailwayTime/tdxlib"
 	"math"
 	"sync"
 	"time"
@@ -10,7 +10,7 @@ import (
 const reUpdateSecondWhenErr = 15
 
 type cacheBaseUnit struct {
-	ptxController *ptxlib.PTXController // 讀取 PTX API 的 controller
+	ptxController *tdxlib.TDXController // 讀取 PTX API 的 controller
 
 	dataTime        time.Time     // 資料最後更新時間(發生錯誤時不會記錄)
 	lastUpdateTime  time.Time     // 最後更新時間
