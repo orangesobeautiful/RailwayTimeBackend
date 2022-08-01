@@ -16,9 +16,9 @@ type RailwayController struct {
 }
 
 // NewRailwayController create a new RailwayController
-func NewRailwayController(appID string, appKey string) (rwController *RailwayController, err error) {
+func NewRailwayController(cID string, cSEC string) (rwController *RailwayController, err error) {
 
-	dController, err := data.NewDataController(appID, appKey)
+	dController, err := data.NewDataController(cID, cSEC)
 	if err != nil {
 		return
 	}

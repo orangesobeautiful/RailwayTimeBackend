@@ -47,7 +47,7 @@ func StartServer(debugMode bool) (err error) {
 	app.Use(iris.Compression)
 
 	// init railway controller
-	rwController, err := controllers.NewRailwayController(serverSetting.APPID, serverSetting.APPKey)
+	rwController, err := controllers.NewRailwayController(serverSetting.CID, serverSetting.CSEC)
 	if err != nil {
 		log.Fatal(err)
 	}

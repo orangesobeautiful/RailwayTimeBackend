@@ -10,8 +10,8 @@ import (
 
 // SettingProperties 設定資料的 struct
 type SettingProperties struct {
-	APPID  string // PTX API 的 ID
-	APPKey string // PTX API 的 Key
+	CID  string // PTX API 的 ID
+	CSEC string // PTX API 的 Key
 
 	ServerHost string // 後端伺服器要監聽的 host
 	ServerPort int32  // 後端伺服器要監聽的 port

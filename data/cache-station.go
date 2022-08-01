@@ -2,7 +2,7 @@ package data
 
 import (
 	ptxrailwaymodels "RailwayTime/models/ptx-railway-models"
-	"RailwayTime/ptxlib"
+	"RailwayTime/tdxlib"
 	"fmt"
 	"regexp"
 	"sync"
@@ -18,10 +18,10 @@ type StationCache struct {
 	regionNameOrder  []string                                 // 紀錄地區的順序
 }
 
-func newStationCache(ptxCtrl *ptxlib.PTXController) (cache *StationCache) {
+func newStationCache(tdxCtrl *tdxlib.TDXController) (cache *StationCache) {
 	cache = &StationCache{
 		&cacheBaseUnit{
-			ptxController: ptxCtrl,
+			ptxController: tdxCtrl,
 			lock:          &sync.RWMutex{},
 		},
 		make(map[string]*ptxrailwaymodels.StationInfo),
