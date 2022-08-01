@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"RailwayTime/data"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -16,8 +17,7 @@ type RailwayController struct {
 }
 
 // NewRailwayController create a new RailwayController
-func NewRailwayController(cID string, cSEC string) (rwController *RailwayController, err error) {
-
+func NewRailwayController(cID, cSEC string) (rwController *RailwayController, err error) {
 	dController, err := data.NewDataController(cID, cSEC)
 	if err != nil {
 		return
@@ -54,12 +54,11 @@ func (ctrl *RailwayController) GetStation() (stationList []*StationInfo, err err
 	}
 
 	// 資料轉換
-	for _, ptxStation := range ptxStationList {
+	for sIdx := range ptxStationList {
 		stationList = append(stationList, &StationInfo{
-			Name:      NameType(ptxStation.StationName),
-			StationID: ptxStation.StationID,
+			Name:      NameType(ptxStationList[sIdx].StationName),
+			StationID: ptxStationList[sIdx].StationID,
 		})
-
 	}
 
 	return
@@ -96,24 +95,31 @@ func (ctrl *RailwayController) GetRegion() (regionList []*RegionInfo, err error)
 // GetTimetableOD serves
 // Method:   GET
 // Resource: /timetable/OD/{originStationID}/to/{destinationStationID}
-func (ctrl *RailwayController) GetTimetableOD(originStationID string, destinationStationID string) (trainTimetableList []*TrainTimetable, err error) {
+func (ctrl *RailwayController) GetTimetableOD(originStationID, destinationStationID string) (
+	trainTimetableList []*TrainTimetable, err error) {
 	// 取得車站時刻表
-	ptxTimetableList, err := ctrl.dataController.GetStationTimetableOD(originStationID, destinationStationID, time.Now().In(ctrl.cstLocation).Format("2006-01-02"))
+	ptxTimetableList, err := ctrl.dataController.GetStationTimetableOD(
+		originStationID, destinationStationID, time.Now().In(ctrl.cstLocation).Format("2006-01-02"))
 	if err != nil {
 		return
 	}
 	// 取得列車延誤資訊
 	allTrainLiveInfo, err := ctrl.dataController.GetAllTrainLiveBoard()
+	if err != nil {
+		log.Printf("GetAllTrainLiveBoard failed, err=%s", err)
+		err = errors.New("internal server error")
+		return
+	}
 
 	// 資料轉換
-	for _, ptxTimetable := range ptxTimetableList {
-		if len(ptxTimetable.StopTimeList) < 2 {
+	for ttIdx := range ptxTimetableList {
+		if len(ptxTimetableList[ttIdx].StopTimeList) < 2 {
 			log.Printf("the len of ptxTimetable.StopTimeList < 2 in GetTimetableOD")
 			err = fmt.Errorf("internal server error")
 			return
 		}
 
-		trainNo := ptxTimetable.TrainInfo.TrainNo
+		trainNo := ptxTimetableList[ttIdx].TrainInfo.TrainNo
 		var delayTime int32
 		if trainLiveBorad, exist := allTrainLiveInfo[trainNo]; exist {
 			delayTime = trainLiveBorad.DelayMinute
@@ -121,24 +127,24 @@ func (ctrl *RailwayController) GetTimetableOD(originStationID string, destinatio
 
 		trainTimetableList = append(trainTimetableList, &TrainTimetable{
 			TrainInfo: &TrainInfo{
-				TrainNo:             ptxTimetable.TrainInfo.TrainNo,
-				Direction:           ptxTimetable.TrainInfo.Direction,
-				TrainTypeName:       NameType(ptxTimetable.TrainInfo.TrainTypeName),
-				TripHeadSign:        ptxTimetable.TrainInfo.TripHeadSign,
-				StartingStationID:   ptxTimetable.TrainInfo.StartingStationID,
-				StartingStationName: NameType(ptxTimetable.TrainInfo.StartingStationName),
-				EndingStationID:     ptxTimetable.TrainInfo.EndingStationID,
-				EndingStationName:   NameType(ptxTimetable.TrainInfo.EndingStationName),
-				TripLine:            ptxTimetable.TrainInfo.TripLine,
-				DailyFlag:           ptxTimetable.TrainInfo.DailyFlag,
-				ExtraTrainFlag:      ptxTimetable.TrainInfo.ExtraTrainFlag,
-				Note:                ptxTimetable.TrainInfo.Note,
+				TrainNo:             ptxTimetableList[ttIdx].TrainInfo.TrainNo,
+				Direction:           ptxTimetableList[ttIdx].TrainInfo.Direction,
+				TrainTypeName:       NameType(ptxTimetableList[ttIdx].TrainInfo.TrainTypeName),
+				TripHeadSign:        ptxTimetableList[ttIdx].TrainInfo.TripHeadSign,
+				StartingStationID:   ptxTimetableList[ttIdx].TrainInfo.StartingStationID,
+				StartingStationName: NameType(ptxTimetableList[ttIdx].TrainInfo.StartingStationName),
+				EndingStationID:     ptxTimetableList[ttIdx].TrainInfo.EndingStationID,
+				EndingStationName:   NameType(ptxTimetableList[ttIdx].TrainInfo.EndingStationName),
+				TripLine:            ptxTimetableList[ttIdx].TrainInfo.TripLine,
+				DailyFlag:           ptxTimetableList[ttIdx].TrainInfo.DailyFlag,
+				ExtraTrainFlag:      ptxTimetableList[ttIdx].TrainInfo.ExtraTrainFlag,
+				Note:                ptxTimetableList[ttIdx].TrainInfo.Note,
 			},
-			OriginStationStopTime:      ptxTimetable.StopTimeList[0],
-			DestinationStationStopTime: ptxTimetable.StopTimeList[1],
+			OriginStationStopTime:      ptxTimetableList[ttIdx].StopTimeList[0],
+			DestinationStationStopTime: ptxTimetableList[ttIdx].StopTimeList[1],
 			DelayMinute:                delayTime,
 		})
 	}
 
-	return
+	return trainTimetableList, nil
 }

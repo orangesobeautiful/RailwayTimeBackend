@@ -3,7 +3,6 @@ package data
 import (
 	ptxrailwaymodels "RailwayTime/models/ptx-railway-models"
 	"RailwayTime/tdxlib"
-	"fmt"
 	"regexp"
 	"sync"
 	"time"
@@ -37,19 +36,15 @@ func newStationCache(tdxCtrl *tdxlib.TDXController) (cache *StationCache) {
 
 // update 更新資料
 func (cache *StationCache) update() {
-	timeNow := time.Now()
-
 	// 取得新資料並檢查錯誤
 	stationListResponse, err := cache.ptxController.GetStationInfo()
-	cache.lastUpdateTime = timeNow
-	cache.lastUpdateError = err
 	if err != nil {
 		cache.setNextUpdateTimer(reUpdateSecondWhenErr * time.Second)
 		return
 	}
 
 	// 更新資料
-	cache.dataTime = timeNow
+
 	// 初始化新資料
 	var newStationData = make(map[string]*ptxrailwaymodels.StationInfo)
 	var newStationNameOrder []string
@@ -59,12 +54,7 @@ func (cache *StationCache) update() {
 	for _, stationInfo := range stationListResponse.StationList {
 		newStationData[stationInfo.StationID] = stationInfo
 		newStationNameOrder = append(newStationNameOrder, stationInfo.StationID)
-		var addressRegex *regexp.Regexp
-		addressRegex, err = regexp.Compile("([0-9]+)([^縣市]+)(.*)")
-		if err != nil {
-			err = fmt.Errorf("regexp compile failed, error=%s", err)
-			return
-		}
+		addressRegex := regexp.MustCompile(`(\d+)([^縣市]+)(.*)`)
 		ZhTwAddress := stationInfo.StationAddress
 		addressMatch := addressRegex.FindSubmatch([]byte(ZhTwAddress))
 		if len(addressMatch) > 2 {
@@ -80,7 +70,6 @@ func (cache *StationCache) update() {
 				}
 				newRegionNameOrder = append(newRegionNameOrder, zhtwRegionName)
 			}
-
 		}
 	}
 	cache.lock.Lock()
@@ -93,8 +82,6 @@ func (cache *StationCache) update() {
 	// 設定下次更新資料時間
 	cache.setNextUpdateTimerByPTXInfo(stationListResponse.UpdateTime, stationListResponse.UpdateInterval,
 		stationListResponse.SrcUpdateTime, stationListResponse.SrcUpdateInterval)
-
-	return
 }
 
 // GetStationList 取得車站列表

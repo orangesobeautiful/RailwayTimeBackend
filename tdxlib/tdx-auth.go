@@ -1,6 +1,7 @@
 package tdxlib
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,7 +40,7 @@ func decodeAuthResp(respBody io.ReadCloser) (arInfo authRespInfo, err error) {
 // genAccessToken 取得 TDX 的 Token
 func (tc *TDXController) getAccessToken() (refreshAfter time.Duration, err error) {
 	// 準備 http.Request
-	req, _ := http.NewRequest("POST",
+	req, _ := http.NewRequestWithContext(context.Background(), "POST",
 		"https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token",
 		genAuthReqData(tc.cID, tc.cSEC))
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
@@ -53,6 +54,7 @@ func (tc *TDXController) getAccessToken() (refreshAfter time.Duration, err error
 	if resp.StatusCode != http.StatusOK {
 		failedMsgBytes, _ := io.ReadAll(resp.Body)
 		err = fmt.Errorf("%d %s", resp.StatusCode, failedMsgBytes)
+		resp.Body.Close()
 		return
 	}
 
@@ -62,11 +64,12 @@ func (tc *TDXController) getAccessToken() (refreshAfter time.Duration, err error
 	if err != nil {
 		return
 	}
-	tc.Lock()
+	tc.tokenRWLock.Lock()
 	tc.authorization = "Bearer " + arInfo.AccessToken
 	refreshAfter = time.Duration(arInfo.ExpiresIn)*time.Second - updateBufferDuration
-	tc.Unlock()
-	return
+	tc.tokenRWLock.Unlock()
+
+	return refreshAfter, nil
 }
 
 // setUpdateTimer 設定下次更新的 timer

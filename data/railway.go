@@ -15,7 +15,8 @@ func (ctrl *Controller) GetRegionList() (regionList []ptxrailwaymodels.RegionInf
 }
 
 // GetStationTimetableOD 獲取指定日期起迄站時刻表
-func (ctrl *Controller) GetStationTimetableOD(originStationID string, destinationStationID string, trainDate string) (trainTimetableList []ptxrailwaymodels.TrainTimetableInfo, err error) {
+func (ctrl *Controller) GetStationTimetableOD(originStationID, destinationStationID, trainDate string) (
+	trainTimetableList []ptxrailwaymodels.TrainTimetableInfo, err error) {
 	timetableListRspInfo, err := ctrl.odStationTimetableCache.GetODStationTimetable(originStationID, destinationStationID, trainDate)
 	if err != nil {
 		return

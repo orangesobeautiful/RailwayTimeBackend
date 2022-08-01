@@ -12,9 +12,6 @@ const reUpdateSecondWhenErr = 15
 type cacheBaseUnit struct {
 	ptxController *tdxlib.TDXController // 讀取 PTX API 的 controller
 
-	dataTime        time.Time     // 資料最後更新時間(發生錯誤時不會記錄)
-	lastUpdateTime  time.Time     // 最後更新時間
-	lastUpdateError error         // 最後更新時發生的錯誤
 	nextUpdateTime  time.Time     // 預計下次的更新時間
 	updateTimer     *time.Timer   // 更新計時器
 	updateTimerFunc func()        // 更新資料的 timer 需要呼叫的 func
@@ -27,7 +24,8 @@ func (unit *cacheBaseUnit) setNextUpdateTimer(d time.Duration) {
 }
 
 // setNextUpdateTimerByPTXRsp 根據 PTX 資料回傳的資料更新時間設定下次更新 timer
-func (unit *cacheBaseUnit) setNextUpdateTimerByPTXInfo(ptxUpdateTime time.Time, ptxUpdateInterval int32, srcUpdateTime time.Time, srcUpdateInterval int32) {
+func (unit *cacheBaseUnit) setNextUpdateTimerByPTXInfo(
+	ptxUpdateTime time.Time, ptxUpdateInterval int32, srcUpdateTime time.Time, srcUpdateInterval int32) {
 	nowTime := time.Now()
 	var nextUpdateInterval time.Duration
 	if srcUpdateInterval > 0 {

@@ -14,7 +14,8 @@ func (tc *TDXController) GetStationInfo() (stationListRsp *ptxrailwaymodels.PTXS
 }
 
 // GetODStationTimetable 取得指定日期起訖站時刻表
-func (tc *TDXController) GetODStationTimetable(originStationID string, destinationStationID string, trainDate string) (timetableListRsp *ptxrailwaymodels.PTXDailyTrainTimeTableListResponse, err error) {
+func (tc *TDXController) GetODStationTimetable(originStationID, destinationStationID, trainDate string) (
+	timetableListRsp *ptxrailwaymodels.PTXDailyTrainTimeTableListResponse, err error) {
 	apiURL := fmt.Sprintf(apiBasicBaseURL+"/v3/Rail/TRA/DailyTrainTimetable/OD/%s/to/%s/%s", originStationID, destinationStationID, trainDate)
 	timetableListRsp = &ptxrailwaymodels.PTXDailyTrainTimeTableListResponse{}
 	err = tc.JSONGet(apiURL, nil, &timetableListRsp)
