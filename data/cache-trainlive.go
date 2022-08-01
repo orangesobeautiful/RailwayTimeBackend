@@ -30,18 +30,14 @@ func newTrainLiveBoradCache(tdxCtrl *tdxlib.TDXController) (cache *TrainLiveBora
 
 // update 更新資料
 func (cache *TrainLiveBoradCache) update() {
-	timeNow := time.Now()
 	// 取得新資料並檢查錯誤
 	trainLiveBoardListRsp, err := cache.ptxController.GetTrainLiveBoard()
-	cache.lastUpdateTime = timeNow
-	cache.lastUpdateError = err
 	if err != nil {
 		cache.setNextUpdateTimer(reUpdateSecondWhenErr * time.Second)
 		return
 	}
 
 	// 更新資料
-	cache.dataTime = timeNow
 	var newData = make(map[string]*ptxrailwaymodels.TrainLiveBoardInfo)
 	for _, trainLiveBorad := range trainLiveBoardListRsp.TrainLiveBoardList {
 		newData[trainLiveBorad.TrainNo] = trainLiveBorad
@@ -53,8 +49,6 @@ func (cache *TrainLiveBoradCache) update() {
 	// 設定下次更新資料時間
 	cache.setNextUpdateTimerByPTXInfo(trainLiveBoardListRsp.UpdateTime, trainLiveBoardListRsp.UpdateInterval,
 		trainLiveBoardListRsp.SrcUpdateTime, trainLiveBoardListRsp.SrcUpdateInterval)
-
-	return
 }
 
 // GetTrainLiveBorad 取得指定列車的即時動態資訊
@@ -123,22 +117,25 @@ func (cache *ODStationTimeableCache) update() {
 	cache.lock.Unlock()
 
 	// 設定下次更新資料時間
-	nextUpdateTime := time.Date(nowCSTTime.Year(), nowCSTTime.Month(), nowCSTTime.Day()+1, 0, 30, 0, nowCSTTime.Nanosecond(), cache.cstLocation)
+	nextUpdateTime := time.Date(
+		nowCSTTime.Year(), nowCSTTime.Month(), nowCSTTime.Day()+1, 0, 30, 0, nowCSTTime.Nanosecond(), cache.cstLocation)
 	cache.setNextUpdateTimer(nextUpdateTime.Sub(nowCSTTime))
 }
 
 // odStationKey 起訖站在 cache 中索引的 key
-func odStationKey(originStationID string, destinationStationID string) string {
+func odStationKey(originStationID, destinationStationID string) string {
 	return originStationID + "~" + destinationStationID
 }
 
 // GetODStationTimetable 取得指定日期起迄站時刻表
-func (cache *ODStationTimeableCache) GetODStationTimetable(originStationID string, destinationStationID string, trainDate string) (trainTimetable *ptxrailwaymodels.PTXDailyTrainTimeTableListResponse, err error) {
+func (cache *ODStationTimeableCache) GetODStationTimetable(originStationID, destinationStationID, trainDate string) (
+	trainTimetable *ptxrailwaymodels.PTXDailyTrainTimeTableListResponse, err error) {
 	cache.lock.RLock()
 	var timetableRsp *ptxrailwaymodels.PTXDailyTrainTimeTableListResponse
+	var dateData map[string]*ptxrailwaymodels.PTXDailyTrainTimeTableListResponse
 	var dateExist bool
 	var odKey = odStationKey(originStationID, destinationStationID)
-	if dateData, dateExist := cache.dateTimetableData[trainDate]; dateExist && dateData != nil {
+	if dateData, dateExist = cache.dateTimetableData[trainDate]; dateExist && dateData != nil {
 		timetableRsp = dateData[odKey]
 	}
 
@@ -173,5 +170,6 @@ func (cache *ODStationTimeableCache) GetODStationTimetable(originStationID strin
 	cache.lock.Unlock()
 	copyTimetable := *timetableRsp
 	trainTimetable = &copyTimetable
-	return
+
+	return trainTimetable, nil
 }

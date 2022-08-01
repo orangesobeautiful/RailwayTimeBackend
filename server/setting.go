@@ -35,6 +35,7 @@ func readSettingFile() (setting SettingProperties, err error) {
 		}
 		if setting.ServerPort <= 0 || setting.ServerPort > 65535 {
 			err = fmt.Errorf("listen port need to be 1~65535")
+			return
 		}
 	} else if os.IsNotExist(err) {
 		// 如果 setting.conf 不存在
@@ -55,12 +56,11 @@ func readSettingFile() (setting SettingProperties, err error) {
 
 		err = fmt.Errorf("找不到檔案 %s， 由程式自動生成，需要進行編輯", settingFilePath)
 		return
-
 	} else {
 		// 其他錯誤
 		err = fmt.Errorf("failed to check %s status, error=%s", settingFilePath, err)
 		return
 	}
 
-	return
+	return setting, nil
 }

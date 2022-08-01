@@ -17,7 +17,7 @@ type StationInfo struct {
 	StationPosition PointType `json:"StationPosition"` // 車站座標
 	StationAddress  string    `json:"StationAddress"`  // 車站地址
 	StationPhone    string    `json:"StationPhone"`    // 車站聯絡電話
-	StationClass    string    `json:"StationClass"`    // 車站級別 = ['0: 特等', '1: 一等', '2: 二等', '3: 三等', '4: 簡易', '5: 招呼', '6: 號誌', 'A: 貨運', 'B: 基地', 'X: 非車']
+	StationClass    string    `json:"StationClass"`    // 車站級別
 	StationURL      string    `json:"StationURL"`      // 車站資訊說明網址
 
 	Region string `json:"-"` // 自定義地區(ex: 台北、新竹、高雄...)
@@ -55,8 +55,8 @@ type TrainInfo struct {
 	TrainNo               string                   `json:"TrainNo"`             // 車次代碼
 	RouteID               string                   `json:"RouteID"`             // 營運路線代碼
 	Direction             int32                    `json:"Direction"`           // 行駛方向 : [0:'順行',1:'逆行']
-	TrainTypeID           string                   `json:"TrainTypeID"`         // 車種代嗎
-	TrainTypeCode         string                   `json:"TrainTypeCode"`       // 車種簡碼 = ['1: 太魯閣', '2: 普悠瑪', '3: 自強', '4: 莒光', '5: 復興', '6: 區間', '7: 普快', '10: 區間快']
+	TrainTypeID           string                   `json:"TrainTypeID"`         // 車種代碼
+	TrainTypeCode         string                   `json:"TrainTypeCode"`       // 車種簡碼
 	TrainTypeName         NameType                 `json:"TrainTypeName"`       // 車種名稱
 	TripHeadSign          string                   `json:"TripHeadSign"`        // 車次之目的地方向描述
 	StartingStationID     string                   `json:"StartingStationID"`   // 車次之起始站車站代號
@@ -92,8 +92,8 @@ type PTXDailyTrainTimeTableListResponse struct {
 // TrainLiveBoardInfo 列車即時動態位置資訊
 type TrainLiveBoardInfo struct {
 	TrainNo            string    `json:"TrainNo"`            // 車次代碼
-	TrainTypeID        string    `json:"TrainTypeID"`        // 車種代嗎
-	TrainTypeCode      string    `json:"TrainTypeCode"`      // 車種簡碼 = ['1: 太魯閣', '2: 普悠瑪', '3: 自強', '4: 莒光', '5: 復興', '6: 區間', '7: 普快', '10: 區間快']
+	TrainTypeID        string    `json:"TrainTypeID"`        // 車種代碼
+	TrainTypeCode      string    `json:"TrainTypeCode"`      // 車種簡碼
 	TrainTypeName      NameType  `json:"TrainTypeName"`      // 車種名稱
 	StationID          string    `json:"StationID"`          // 經過/停靠車站代號
 	StationName        NameType  `json:"StationName"`        // 經過/停靠車站名稱

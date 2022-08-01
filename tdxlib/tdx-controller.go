@@ -1,6 +1,7 @@
 package tdxlib
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -19,9 +20,9 @@ const authFailedRetryInterval = 3 * time.Minute
 // apiBasicBaseURL tdx 基礎服務 API 的 Base URL
 const apiBasicBaseURL string = "https://tdx.transportdata.tw/api/basic"
 
-//TDXController TDX API Controller
+// TDXController TDX API Controller
 type TDXController struct {
-	sync.RWMutex
+	tokenRWLock   sync.RWMutex
 	cID           string // Client Id
 	cSEC          string // Client Secret
 	authorization string // authorization header value
@@ -49,18 +50,19 @@ func NewTDXController(cID, cSEC string) (resTC *TDXController, err error) {
 
 // GetAuthorization 取得 authorization
 func (tc *TDXController) getAuthorization() (authorization string) {
-	tc.RLock()
+	tc.tokenRWLock.RLock()
 	authorization = tc.authorization
-	tc.RUnlock()
+	tc.tokenRWLock.RUnlock()
 	return
 }
 
 // APIGet 取的特定API的資料
-func (tc *TDXController) APIGet(url string) (respBody io.ReadCloser, err error) {
+func (tc *TDXController) APIGet(apiURL string) (respBody io.ReadCloser, err error) {
 	authorization := tc.getAuthorization()
 
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequestWithContext(context.Background(),
+		"GET", apiURL, http.NoBody)
 	if err != nil {
 		return
 	}

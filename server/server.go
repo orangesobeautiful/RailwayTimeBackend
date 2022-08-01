@@ -2,7 +2,6 @@ package server
 
 import (
 	"RailwayTime/controllers"
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -14,15 +13,6 @@ import (
 )
 
 var serverSetting SettingProperties
-
-func prettyPrint(v interface{}) {
-	jsonBytes, err := json.MarshalIndent(v, "", "\t")
-	if err != nil {
-		fmt.Println("failed to convert to json")
-		return
-	}
-	fmt.Println(string(jsonBytes))
-}
 
 // StartServer start server
 func StartServer(debugMode bool) (err error) {
@@ -60,5 +50,6 @@ func StartServer(debugMode bool) (err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return
+
+	return nil
 }
